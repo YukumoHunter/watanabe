@@ -1,4 +1,5 @@
 mod commands;
+mod database;
 
 use dotenv::dotenv;
 use std::env;
@@ -22,9 +23,13 @@ use serenity::{
     }
 };
 
+use rusqlite::Connection;
+
 use commands::{
     lucky_message::*,
-    name_react::*
+    name_react::*,
+    emoji::*,
+    catchphrase::*
 };
 
 struct Handler;
@@ -35,7 +40,7 @@ impl EventHandler for Handler {
         println!("Connected as bot: {}", ready.user.name);
         
         ctx.set_presence(
-            Some(Activity::competing("the game")),
+            Some(Activity::playing("the game of life")),
             OnlineStatus::Online
         ).await;
     }
@@ -50,7 +55,7 @@ impl EventHandler for Handler {
 }
 
 #[group]
-#[commands(pingus)]
+#[commands(pingus, emoji, catchphrase)]
 struct Command;
 
 #[tokio::main]
@@ -63,6 +68,12 @@ async fn main() {
             .with_whitespace(true)
             .prefix("."))
         .group(&COMMAND_GROUP);
+
+    // TODO: Create something to handle database actions more elegantly
+    let conn = Connection::open("db.db3")
+        .expect("Error connection to database");
+    database::profile::setup(&conn)
+        .expect("Error setting up database");
 
     let token = env::var("DISCORD_TOKEN").expect("Bot token is not set");
     let mut client = Client::builder(token)

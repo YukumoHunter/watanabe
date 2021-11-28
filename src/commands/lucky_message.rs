@@ -1,13 +1,13 @@
 use rand::Rng;
-use serenity::{client::Context, model::{channel::Message, prelude::{Activity, OnlineStatus}}};
+use serenity::{client::Context, framework::standard::CommandResult, model::{channel::Message, prelude::{Activity, OnlineStatus}}};
 
-pub async fn lucky_message(ctx: &Context, msg: &Message) -> serenity::Result<()> {
+pub async fn lucky_message(ctx: &Context, msg: &Message) -> CommandResult {
     if msg.author.bot { return Ok(()) }
 
     let num: u32 = rand::thread_rng().gen_range(0..1000);
 
     ctx.set_presence(
-        Some(Activity::playing(format!("with yo mom: {}", num))),
+        Some(Activity::playing(format!("the game: {}", num))),
         OnlineStatus::Online
     ).await;
     
@@ -19,5 +19,6 @@ pub async fn lucky_message(ctx: &Context, msg: &Message) -> serenity::Result<()>
         }
         msg.reply(ctx, "Breh moment").await?;
     }
+    
     Ok(())
 }

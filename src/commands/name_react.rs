@@ -1,18 +1,20 @@
 use std::collections::HashMap;
 
-use serenity::{client::Context, model::channel::Message};
+use serenity::{client::Context, framework::standard::CommandResult, model::channel::Message};
 
-pub async fn name_react(ctx: &Context, msg: &Message) -> serenity::Result<()> {
+pub async fn name_react(ctx: &Context, msg: &Message) -> CommandResult {
     // Has to be in a guild for custom emoji
     if let Some(id) = msg.guild_id {
         let mut emojis = id.emojis(&ctx.http).await?;
 
         // TODO: filter emoji using user defined group in database instead
         let reaction_map = HashMap::from([
+            // (emote name, trigger)
             ("pete", "pete"),
             ("sklarp", "sklarp"),
             ("bib", "bib"),
-            ("figohane", "figo")
+            ("figohane", "figo"),
+            ("true", "true")
         ]);
 
         emojis.retain(|e| {
